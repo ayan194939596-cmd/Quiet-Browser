@@ -1,0 +1,27 @@
+name: Build Quiet Browser APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Arrange files
+        run: |
+          mkdir -p src/main/java/com/quiet/browser src/main/res/drawable
+          cp MainActivity.java src/main/java/com/quiet/browser/
+          cp AndroidManifest.xml src/main/
+          cp ic_launcher.xml src/main/res/drawable/
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+      - run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quiet-browser-apk
+          path: build/outputs/apk/debug/*.apk
